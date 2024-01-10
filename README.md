@@ -1,2 +1,2 @@
 # plugin-network-test
-Sage Node network tests via iPerf3
+Sage Node (waggle) network tests via iPerf3
