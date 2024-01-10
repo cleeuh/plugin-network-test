@@ -1,0 +1,18 @@
+name: "iperf-test"
+version: "0.1.0"
+description: "Speed test via iPerf3"
+keywords: "Network, Speed Test, Performance, Evaluation"
+authors: "Christopher Lee"
+collaborators: ""
+funding: ""
+license: ""
+homepage: "https://github.com/cleeuh/plugin-network-test"
+source:
+  architectures:
+    - "linux/amd64"
+    - "linux/arm64"
+inputs:
+  - id: "--command"
+    type: "string"
+    description: "Forwards the command to iPerf3. Example: --command \"0.0.0.0 -p 7575\" becomes \"iperf3 -c 0.0.0.0 -p 7575 --json\" behind the scenes"
+    default: "la.speedtest.clouvider.net -p 5200-5209 -t 5 -bidir"
