@@ -21,6 +21,10 @@ stream_def = {"sender": "upload", "receiver": "download"}
 
 default_command = "la.speedtest.clouvider.net -p 5200-5209 -t 5 -bidir"
 
+def post_error(plugin, error, time_ns, meta):
+    print(error)
+    plugin.publish("iperf3.error", error, timestamp=time_ns, meta=meta)
+
 def sanitize_input(user_input):
     # Allow only alphanumeric characters, dots, and dashes
     sanitized_input = re.sub(r'[^a-zA-Z0-9.\- "\']', '', user_input)
@@ -35,19 +39,27 @@ def main(cmd):
         time_ns = int(time.time_ns())
         meta = {"units": "bits per second", "command": cmd}
 
-        if result.stderr:
-            print(result.stderr)
-            plugin.publish("iperf3.error", result.stderr, timestamp=time_ns, meta=meta)
-        else:
-            print(result.stdout)
-            output = json.loads(result.stdout)
-            
-            for stream in output["end"]["streams"]:
-                for stream_type in stream.keys():
-                    if stream_type in stream_def:
-                        print(stream_def[stream_type])
-                        print(stream[stream_type]["bits_per_second"])
-                        plugin.publish(f'iperf3.{stream_def[stream_type]}.bits.per.sec', float(stream[stream_type]["bits_per_second"]), timestamp=time_ns, meta=meta)
+        try:
+            if result.stderr:
+                post_error(plugin, result.stderr, time_ns, meta)
+            else:
+                print(result.stdout)
+                output = json.loads(result.stdout)
+                
+                if "error" in output:
+                    post_eror(plugin, output["error"], time_ns, meta)
+                    return
+
+                for stream in output["end"]["streams"]:
+                    for stream_type in stream.keys():
+                        if stream_type in stream_def:
+                            print(stream_def[stream_type])
+                            print(stream[stream_type]["bits_per_second"])
+                            plugin.publish(f'iperf3.{stream_def[stream_type]}.bits.per.sec', float(stream[stream_type]["bits_per_second"]), timestamp=time_ns, meta=meta)
+
+        except:
+            post_error(plugin, "non-specific error", time_ns, meta)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
