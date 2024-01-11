@@ -19,7 +19,7 @@ stream_def = {"sender": "upload", "receiver": "download"}
 # default_server = "la.speedtest.clouvider.net"
 # default_port = "5200-5209"
 
-default_command = "la.speedtest.clouvider.net -p 5200-5209 -t 5 -bidir"
+default_command = "la.speedtest.clouvider.net -p 5200-5209 -t 5"
 
 def post_error(plugin, error, time_ns, meta):
     print(error)
